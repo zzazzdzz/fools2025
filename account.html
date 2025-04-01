@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>TheZZAZZGlitch's April Fools Event 2025</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<script src='script.js'></script>
+<link rel='stylesheet' href='style.css'>
+
+<script>
+$(document).ready(function(){
+    updateTimers();
+    setInterval(updateTimers, 1000);
+    if (localStorage.userToken) fetchMessage();
+    else {
+        $("#loader").hide();
+        $(".not_logged_in").css("display", "block");
+    }
+});
+
+function registerUser() {
+    $('#btn_r')[0].disabled = true;
+    apiHit({
+        "r": "register",
+        "username": $("#username_r").val(),
+        "password1": $("#password1_r").val(),
+        "password2": $("#password2_r").val(),
+        "msg": $("#msg_r").val()
+    }, function(r) {
+        $('#btn_r')[0].disabled = false;
+        if (r['error']) {
+            alert(r['msg']);
+            return;
+        }
+        alert("New account successfully registered. You were logged in automatically.");
+        localStorage.userToken = r['data']['token'];
+        localStorage.userName = r['data']['username'];
+        window.location.reload();
+    }, function() {
+        $('#btn_r')[0].disabled = false;
+        alert("Couldn't connect to the server. Try again later.");
+    });
+}
+function logIn() {
+    $('#btn_l')[0].disabled = true;
+    apiHit({
+        "r": "login",
+        "username": $("#username_l").val(),
+        "password": $("#password_l").val()
+    }, function(r) {
+        $('#btn_l')[0].disabled = false;
+        if (r['error']) {
+            alert(r['msg']);
+            return;
+        }
+        localStorage.userToken = r['data']['token'];
+        localStorage.userName = r['data']['username'];
+        window.location.reload();
+    }, function() {
+        $('#btn_l')[0].disabled = false;
+        alert("Couldn't connect to the server. Try again later.");
+    });
+}
+function updateMessage() {
+    $('#btn_m')[0].disabled = true;
+    apiHit({
+        "r": "msg_set",
+        "token": localStorage.userToken,
+        "msg": $("#msg_m").val()
+    }, function(r) {
+        $('#btn_m')[0].disabled = false;
+        if (r['error']) {
+            alert(r['msg']);
+            return;
+        }
+        alert("Message was successfully changed.");
+        window.location.reload();
+    }, function() {
+        $('#btn_m')[0].disabled = false;
+        alert("Couldn't connect to the server. Try again later.");
+    });
+}
+function fetchMessage() {
+    apiHit({
+        "r": "msg_get",
+        "token": localStorage.userToken
+    }, function(r) {
+        if (r['error']) {
+            alert(r['msg']);
+            return;
+        }
+        $('#msg_m').val(atob(r['data']['msg']));
+        $("#loader").hide();
+        if (localStorage['userToken']) {
+            $("#usr").text(localStorage.userName);
+            $(".logged_in").css("display", "block");
+        }
+    }, function() {
+        alert("Couldn't connect to the server. Try again later.");
+    });
+}
+function logOut() {
+    localStorage.userToken = "";
+    localStorage.userName = "";
+    window.location.reload();
+}
+</script>
+
+<div id='content'>
+    <div class="box centered">
+        <h1><a href='/' class='headerlink'>TheZZAZZGlitch's April Fools Event 2025</a></h1>
+        <p id='countdown'>-</p>
+    </div>
+    
+    <div class="box centered logged_in" style='display:none'>
+        <h1>Logged in</h1>
+        <p>You are currently logged in as <b id='usr'>bepis</b>.</p>
+        <div style='margin:15px'>
+            <button class='btn' id='btn_l' onclick='logOut()'>Log out</button>
+        </div>
+        <p><a href='index.html'>Go back to the leaderboard</a></p>
+    </div>
+    
+    <div class="box centered logged_in" style='display:none'>
+        <h1>Change your message</h1>
+        <p>Best scores will have a chance to appear in a video, <a href='https://youtu.be/vXmESw1Zoxo?t=1478'>like here</a>, along with a custom message.<br>
+        You can enter the message below. You may also leave this empty.</p>
+        <div style='margin:15px'>
+            <input type='text' class='inp blocknp' id='msg_m' placeholder='Leave a message (maximum of 150 bytes)' style='width:500px;max-width:500px' maxlength='150'>
+        </div>
+        <div style='margin:15px'>
+            <button class='btn' onclick='updateMessage()' id='btn_m'>Update message</button>
+        </div>
+    </div>
+    
+    <div class="box centered not_logged_in" style='display:none'>
+        <h1>Log in</h1>
+        <p>Created an account already? Please enter your username and password.</p>
+        <div style='margin:15px'>
+            <input type='text' class='inp blocknp' id='username_l' placeholder='Username'>
+            <input type='password' class='inp blocknp' id='password_l' placeholder='Password'>
+            <button class='btn' id='btn_l' onclick='logIn()'>Log in</button>
+        </div>
+    </div>
+    
+    <div class="box centered not_logged_in" style='display:none'>
+        <h1>Create an account</h1>
+        <p>Choose your username and set your password. Make sure you remember it, passwords cannot be reset or changed.</p>
+        <div style='margin:15px'>
+            <input type='text' class='inp blocknp' id='username_r' placeholder='Username (max 20 bytes)' maxlength='20'>
+            <input type='password' class='inp blocknp' id='password1_r' placeholder='Password'>
+            <input type='password' class='inp blocknp' id='password2_r' placeholder='Repeat password'>
+        </div>
+        <p>Best scores will have a chance to appear in a video, <a href='https://youtu.be/vXmESw1Zoxo?t=1478'>like here</a>, along with a custom message.<br>
+        You can enter the message below. You may also leave this empty.</p>
+        <div style='margin:15px'>
+            <input type='text' class='inp blocknp' id='msg_r' placeholder='Leave a message (maximum of 150 bytes)' style='width:500px;max-width:500px' maxlength='150'>
+        </div>
+        <div style='margin:15px'>
+            <button class='btn' onclick='registerUser()' id='btn_r'>Create a new account</button>
+        </div>
+    </div>
+    
+    <div class="box centered" id='loader'>
+        <div style='margin-top:5px'><img src='loading.svg'></div>
+    </div>
+</div>
+

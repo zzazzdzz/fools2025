@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>TheZZAZZGlitch's April Fools Event 2025</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<script src='script.js'></script>
+<link rel='stylesheet' href='style.css'>
+
+<script>
+$(document).ready(function(){
+    updateTimers();
+    setInterval(updateTimers, 1000);
+    if (localStorage['userToken']) {
+        $("#usr").html("You are currently logged in as <b>" + entities(localStorage.userName) + "</b>.<br>Not you? <a href='account.html'>Go to account management</a>");
+    }
+});
+
+function submitCode() {
+    $('#btn_c')[0].disabled = true;
+    apiHit({
+        "r": "submit",
+        "token": localStorage.userToken,
+        "code": $("#code").val()
+    }, function(r) {
+        if (r['error']) {
+            $('#btn_c')[0].disabled = false;
+            alert(r['msg']);
+            return;
+        }
+        $("#entry_name").html("#" + (r['data']['ent_id']+1) + ": " + r['data']['ent_name']);
+        $("#entry_text").html(atob(r['data']['ent_content']));
+        $("#box_submit").css("display", "none");
+        $("#box_entry").fadeIn(1000);
+    }, function() {
+        $('#btn_c')[0].disabled = false;
+        alert("Couldn't connect to the server. Try again later.");
+    });
+}
+</script>
+
+<div id='content'>
+    <div class="box centered">
+        <h1>TheZZAZZGlitch's April Fools Event 2025</h1>
+        <p id='countdown'>-</p>
+    </div>
+    
+    <div class="box centered" id="box_submit">
+        <h1>Submit a completion code</h1>
+        <p id='usr'><b>You are not logged in</b>. Your progress will not be saved on the leaderboard.<br>
+        Please <a href='account.html'>log in or register</a> first if you want to make your score visible.</p>
+        <div style='margin:15px'>
+            <input type='text' class='inp' id='code' autocomplete='off' style='width: 250px'>
+            <button class='btn' onclick='submitCode()' id='btn_c'>Submit code</button>
+        </div>
+        <p><a href='index.html'>Go back to the leaderboard</a></p>
+    </div>
+    
+    <div class="box centered" id="box_entry" style='display:none'>
+        <h1>New entry acquired</h1>
+        <p><b id='entry_name'>#0: bepis</b></p>
+        <div id='entry_text'><p>bepis</p></div>
+        <p><a href='index.html'>Go back to the leaderboard</a></p>
+    </div>
+</div>
+

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<title>TheZZAZZGlitch's April Fools Event 2025</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<script src='script.js'></script>
+<link rel='stylesheet' href='style.css'>
+
+<script>
+$(document).ready(function(){
+    updateTimers();
+    setInterval(updateTimers, 1000);
+    getSmolLeaderboard();
+    if (localStorage['userToken']) {
+        $("#usr").html("Load the save file in Pok&eacute;mon Blue for the best experience.<br>You are currently logged in as <b>" + entities(localStorage.userName) + "</b>. Not you? <a href='account.html'>Go to account management</a>.");
+    }
+});
+</script>
+
+<div id='content'>
+    <div class="box centered">
+        <h1>TheZZAZZGlitch's April Fools Event 2025</h1>
+        <p id='countdown'>-</p>
+    </div>
+    
+    <div class="box centered pad">
+        <form class='btn-form' action='fools.sav'><button class='btn'>Download the save file</button></form>
+        <form class='btn-form' action='submit.html'><button class='btn'>Submit completion code</button></form>
+        <p id='usr'>Load the save file in Pok&eacute;mon Blue for the best experience.<br>You are not currently logged in. <a href='account.html'>Go to account management</a></p>
+    </div>
+    
+    <div class="box centered">
+        <h1>The leaderboard</h1>
+        <div id='leaderboard'>
+            <img src='loading.svg'>
+        </div>
+    </div>
+</div>
+
