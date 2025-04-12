@@ -1,0 +1,18 @@
+Great!
+So the question I got...
+
+Train A travels at constant
+speed. Train B departs one
+day later, traveling in the
+same direction at twice the
+speed of train A.
+
+Train B makes a twenty
+minute stop for every hour
+it travels, but train A
+travels without any stops.
+
+How many stops will train B
+make before it catches up
+to train A, including the
+stop where they meet up?

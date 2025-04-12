@@ -1,0 +1,2 @@
+Integrity check failed.
+Please redownload the save.

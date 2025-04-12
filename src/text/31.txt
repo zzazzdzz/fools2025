@@ -1,0 +1,8 @@
+You found a POST endpoint!
+
+You try to GET it, but you
+can't. Hahaha, funny joke!
+
+GET it?
+No, you obviously don't.
+This joke is not an endpoint.

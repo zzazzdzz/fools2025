@@ -1,0 +1,4 @@
+You try to pick up the item.
+
+Suddenly, it vanishes from
+your sight somehow...
