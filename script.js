@@ -26,7 +26,7 @@ function updateTimers(){
 }
 
 function apiHit(data, fsucc, ffail) {
-    $.post("https://bepis.fools2025.store/api.php", {"d": JSON.stringify(data)}).done(fsucc).fail(ffail);
+    $.get("leaderboard.json").done(fsucc).fail(ffail);
 }
 
 function entities(s){

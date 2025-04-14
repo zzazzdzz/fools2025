@@ -15,26 +15,114 @@ $(document).ready(function(){
     }
 });
 
-function submitCode() {
-    $('#btn_c')[0].disabled = true;
-    apiHit({
-        "r": "submit",
-        "token": localStorage.userToken,
-        "code": $("#code").val()
-    }, function(r) {
-        if (r['error']) {
-            $('#btn_c')[0].disabled = false;
-            alert(r['msg']);
-            return;
-        }
-        $("#entry_name").html("#" + (r['data']['ent_id']+1) + ": " + r['data']['ent_name']);
-        $("#entry_text").html(atob(r['data']['ent_content']));
-        $("#box_submit").css("display", "none");
-        $("#box_entry").fadeIn(1000);
-    }, function() {
-        $('#btn_c')[0].disabled = false;
-        alert("Couldn't connect to the server. Try again later.");
-    });
+var ents = [
+	[`Glitchland`, `
+		<p>The first and biggest land of the Simulation, divided into four districts. This region is favored by many due to its sparse wild Pok&eacute;mon population and the abundance of human settlements. It is often seen as the most peaceful.</p>
+		<p>Originally built upon the foundations of the flaky Generation I engine, it has since undergone a rework, moving forward to the more advanced framework of Generation III. Despite the shift, remnants of the region's past architecture still linger, and fill countless adventurers with nostalgia.</p>
+	`],
+	[`Glitch Islands`, `
+		<p>The second realm of the Simulation, consisting of a vast expanse of scattered islands. Visitors are drawn to this area's stunning landscapes and high concentration of wild Pok&eacute;mon, making it a prime destination for tourism. Unlike its predecessor, this land thrives on the art of Pok&eacute;mon battling. Its inhabitants embrace Pok&eacute;mon training as both a way of life and a mark of status.</p>
+		<p>Built upon the Generation II engine, the area carries a distinct identity which is protected by its people. Even though upgrade possibilities exist, the inhabitants resist change. To them, progress is not measured in code updates - rather the legacy they carve into the Simulation itself.</p>
+	`],
+	[`Glitchtopia`, `
+		<p>Known as the "world of oddities", Glitchtopia stands as the third and final realm of the Simulation. Unlike the other lands, no humans reside here; only Pok&eacute;mon could call this ever-changing domain their home. This is the place where digital data evolves in ways no one fully understands - logic bends, landscapes shift, and the rules of reality are rewritten in an endless cycle.</p>
+		<p>To outsiders, Glitchtopia is a chaotic and untamed wild land. Its unpredictable nature makes it both fascinating and dangerous. Most inhabitants of the Simulation regard it as an off-limits zone; a realm best observed from a distance rather than explored. However, some adventurers have embarked into expeditions there, and even managed to return to tell the tale.</p>
+	`],
+	[`The Simulation`, `
+		<p>Glitch Islands, Glitchland and Glitchtopia are full-scale simulations of sentient life created on top of old Pok&eacute;mon game engines. These worlds were all conceived as a unique experiment, with the goal of examining human behavior when exposed to realistic glitch phenomena.</p>
+		<p>The Simulation is fully digital, with its rules fully governed by code, and is not contained within the human world. However, all sentient life is precious, and the digital nature of the world doesn't make its existence any less real. People have formed bonds, fought their battles and lived their full lives in this virtual, experimental land.</p>
+	`],
+	[`The Glitch Lord`, `
+		<p>The Simulation uses internal hexadecimal identifiers to distinguish all inhabitants. Due to an off-by-one error within world creation code, an entity with an out-of-bounds identifier was spawned. This gave birth to a sentient life form with invalid internal parameters - the Glitch Lord.</p>
+		<p>To an inside observer and to the Glitch Lord himself, these corrupted parameters could be perceived as an unnatural, godlike power. Seeing himself as a being beyond conventional limits, the Glitch Lord embraced his self-proclaimed divinity and sought after absolute dominion over the digital realm. His vision was not one of balance, nor of harmony between humans and Pok&eacute;mon - but of a world shaped entirely for glitches.</p>
+	`],
+	[`Glitch Lord's Corruption`, `
+		<p>Having full knowledge and control over the Simulation's code and internal memory structures, the Glitch Lord could manipulate data of those who opposed his will. By precisely modifying certain variables, it's possible to make foes suffer, torture them, or convert them into loyal servants. The victim's behavior could then be modified to spread the corruption further, akin to a computer virus.</p>
+		<p>The Glitch Lord used this ability extensively to secure his control over all lands within the Simulation. It is this mastery over glitch phenomena that has made him such a formidable foe.</p>
+	`],
+	[`Glitch Lord's Downfall`, `
+		<p>Defeating the Glitch Lord and having him surrender was not trivial. The Glitch Lord's presence is a side-effect of delicate parameters, such as position of data within the ROM, as well as arrangement of internal data structures. Removing the Glitch Lord or modifying his behavior would require modifying the Simulation, thus altering reality.</p>
+		<p>This, of course, was not a morally sound option. The only way to proceed forward was for the Glitch Lord to admit defeat by himself, through the actions of others - only then would the world be saved without causing harm to the ones who live there.</p>
+	`],
+	[`Glitch Lord sealed away`, `
+		<p>Having been defeated and chased away, the Glitch Lord has willingly conceded control over all territories, marking the start of a new era of everlasting peace.</p>
+		<p>No longer under the shadow of his reign, the inhabitants of the Simulation are able to feel safe for the first time in generations. In an unprecedented event, they have dispersed around the neighboring lands, including otherwise unexplored Pok&eacute;mon regions like Johto and Kanto.</p>
+	`],
+	[`TheZZAZZGlitch`, `
+		<p>The creator of the Simulation - the worlds of Glitchland, Glitch Islands and Glitchtopia were all conjured by him.</p>
+		<p>Even though these worlds were conceived as an experiment, they were never mere lines of code to him. He saw value in every life emerged within the Simulation. He cared for all inhabitants as more than just data - but as individuals with real experiences, emotions, and struggles. When the Glitch Lord's influence threatened to consume everything, he made the choice to step in - not as a ruler, but as a guiding force. It was his careful, measured intervention that turned the tide.</p>
+	`],
+	[`Avatars`, `
+		<p>To aid the participants of the Simulation in defeating the Glitch Lord, TheZZAZZGlitch has created elaborate interfaces to venture inside and interact with the worlds of Glitch Islands, Glitchland and Glitchtopia.</p>
+		<p>Through the usage of these interfaces, a placeholder character is created - an Avatar, which is able to be controlled by a player, akin to a video game. This way, volunteers are able to go inside and explore the Simulation, whilst not appearing abnormal to any people living there.</p>
+	`],
+	[`Glitch Research Institute`, `
+		<p>The Glitch Research Institute is a pioneering institution committed to studying and understanding glitch phenomena. Surrounded by glitches throughout their daily life, the inhabitants of the Simulation turned their curiosity into action, dedicating resources to uncovering the true nature of their world.</p>
+		<p>Through continued research, scientists have discovered many of the Simulation's deepest secrets; transforming what was once seen as dangerous into something that could be studied, controlled, and even used for good. These contributions have allowed inhabitants to navigate and adapt to their unpredictable reality, greatly increasing everyone's quality of life - despite some accidents caused by reckless experimentation.</p>
+	`],
+	[`Research Group Alpha`, `
+		<p>Glitch Research Group Alpha is a team of scientists based in the Verdant Kingdom of Glitch Islands. Fully dedicated to opposing the Glitch Lord and restoring balance to the world of the Simulation, their research focused on ways to combat various types of damage caused by memory corruption.</p>
+		<p>In pursuit of this mission, they engineered the Glorious Glitch Core - an artifact of immense power, designed to purge corrupted data at its very source. With its activation, all loaded corrupted parameters are restored to safe values. With this powerful tool, the Glitch Lord was banished from Glitch Islands, sealing away his influence over the land.</p>
+	`],
+	[`Criminal Activity`, `
+		<p>Not all inhabitants of the Simulation stood against the Glitch Lord - some sought to ally with him and devise new methods of spreading corrupted data with even greater efficiency. Team Rocket realized the potential within glitch phenomena, thus establishing the Team Rocket Glitch Research Division.</p>
+		<p>The organization's goal was to wield the power of glitches for its own gain. They strived to further the dominion of the Glitch Lord, hoping to ultimately lead to the world's collapse. Even after the Glitch Lord's downfall, Team Rocket's Glitch Research Division continues to operate to this day.</p>
+	`],
+	[`Glitch Items`, `
+		<p>Having gained access to glitch items, inhabitants soon noticed that some of them could be used for beneficial effects. It didn't take long for glitch items to become widely used as tools, praised for their unusual yet powerful properties.</p>
+		<p>However, many of these items had effects that stemmed from undefined, erratic behavior in the Simulation's code. As such, using them came with risks. Despite their advantages, glitch items could easily backfire, leading to catastrophic consequences. Many unfortunate accidents involving glitch items were recorded in the past, causing pain and loss of loved ones.</p>
+	`],
+	[`Arbitrary Code Execution`, `
+		<p>In a simulated world, errors are inevitable. These errors, if correctly exploited, could grant the ability to modify internal structures at will - thus rewriting memory, reshaping reality, and even executing custom logic within the system itself. This phenomenon is known as Arbitrary Code Execution.</p>
+		<p>By inhabitants, such exploits are often treated as unexplained mysteries of their surrounding world. Having existed alongside these strange occurrences since the dawn of their world, the inhabitants accept the presence of such exploits as a fundamental truth.</p>
+	`],
+	[`Celestial Sisters`, `
+		<p>One attempt to aid the inhabitants of the Simulation in their fight against the Glitch Lord was the selection of three champions. Chosen through a divine vision, they were bestowed with godlike power and entrusted with protecting the universe at any cost. Thus, the Celestial Sisters were born - Danalise, Laylah, and Ephemei, bound by their sacred duty.</p>
+		<p>Though their souls are eternal, their physical forms are not. Ephemei, one of the three, exists only in spirit, and her body is long lost to time. Yet even in this incorporeal state, her influence remains as powerful as ever.</p>
+	`],
+	[`Fun Values`, `
+		<p>True randomness cannot exist in a digital world; every outcome is ultimately governed by code and bound by predetermined logic. To simulate the uncertainties of reality within the Simulation, each newly created entity is assigned a unique value - a sort of hidden signature, which defines all aspects of their existence.</p>
+		<p>These values, nicknamed as \`Fun Values\` by the community, shape everyone's journey in subtle and unpredictable ways. They influence the perception of the world in various ways, recreating the real life's notions of uncertainty in the Simulation.</p>
+	`],
+	[`Paranormal Sightings`, `
+		<p>Several inhabitants of the Simulation claim to have experienced strange, otherworldly occurrences. They were proved to be correlated to values of certain internal variables - most notably, Fun Values.</p>
+		<p>Some speculate that these experiences were deliberately inserted by world creators to serve as an outlet for communicating their thoughts and feelings. With no one else to confide in, people responsible for maintaining the Simulation whispered their secrets into the very code of existence, leaving traces for those who dared to listen.</p>
+	`],
+	[`Unused Maps`, `
+		<p>Since Glitchland was the first realm to emerge within the Simulation, it was crafted through unrefined processes. Because of that, Glitchland is known for its dense concentration of unused maps - fragments of forgotten code left behind in the land's creation.</p>
+		<p>Some of these hidden spaces became accessible through glitches, drawing countless explorers and adventurers. With every passing day, new areas are uncovered - and with each discovery, more insight into the Simulation's inner workings is gained.</p>
+	`],
+	[`Matthew, the Great Designer`, `
+		<p>Matthew is a self-taught aspiring level designer from Glitchland, with his goals set on becoming the greatest in the world. His ambitious projects are often met with harsh criticism and dismissed as unpolished - however, he seems rather unbothered by it.</p>
+		<p>While many overlook his work, a small but dedicated group of supporters continues to see the heart behind his efforts. All that matters is, Matthew keeps pushing forward, undaunted by failure. He is hoping that one day, the maps he created will resonate just as much with others as they did with him.</p>
+	`],
+	[`Matt, the Worried Explorer`, `
+		<p>Matt - not to be confused with Matthew, a well known level designer - is a seeker of treasure, though fortune has never truly been on his side.</p>
+		<p>Despite his endless pursuit, he has yet to claim any riches for himself. Instead, he is offering his knowledge and advice for fellow adventurers, providing the clues needed to reach hidden treasures. He resides in his home in Glitchland, but he is also often seen wandering through distant lands, including Glitch Islands.</p>
+	`],
+	[`Delirians`, `
+		<p>Glitch phenomena do not come without side effects. If one is not careful, memory regions responsible for one's cognitive skills could get irreversibly corrupted, leading into a permanent state of delirium. Most Delirians come from Glitchland, due to the popularity of recreational glitch item usage in that region.</p>
+		<p>While Delirians are not inherently harmful or problematic, Glitchland's authorities consider them as a potential threat due to their erratic behavior. Because of that, many of them have escaped into neighboring areas, like Glitchtopia and Glitch Islands.</p>
+	`],
+	[`Hacking Challenges`, `
+		<p>The fully digital world of the Simulation requires proper defenses against emerging cyberthreats - an unknown actor erasing everyone's existence could be devastating. To safeguard the integrity of the Simulation, its creators and maintainers have created intricate hacking challenges, which were designed to expose vulnerabilities before they could be exploited.</p>
+		<p>These challenges, presented to the community, became a proving ground for problem-solvers and security experts. Each solved puzzle provided valuable insights, allowing the Simulation's maintainers to strengthen their systems and fortify their world against unseen dangers.</p>
+	`],
+	[`bepis`, `
+		<p>Congratulations, you found the unused entry!</p>
+	`],
+	[`Conglaturation`, `
+		<p>Good job - seems you have completed this year's final hacking challenge! Did you enjoy it? Did you pull off the graph theory gamer move? Perhaps you went for the traditional brute force approach? Or maybe you created an over-engineered solution by making a CPU emulator? How fast did your solver run?</p>
+		<p>No matter what your solution was, you deserve victory! As I said, the feature creep of Fools Events was cut short, and we're back to simpler times. Even hacking challenges got a budget cut, coming down to three instead of four... but at least you got more than one video for the last couple months, right? See you next year! \\o/</p>
+		<p>~ TheZZAZZGlitch</p>
+	`]
+];
+
+function showEntry(x) {
+	$("#entry_name").html("#" + (x+1) + ": " + ents[x][0]);
+	$("#entry_text").html(ents[x][1]);
+	$("#box_submit").css("display", "none");
+	$("#box_entry").fadeIn(1000);
 }
 </script>
 
@@ -45,21 +133,23 @@ function submitCode() {
     </div>
     
     <div class="box centered" id="box_submit">
-        <h1>Submit a completion code</h1>
-        <p id='usr'><b>You are not logged in</b>. Your progress will not be saved on the leaderboard.<br>
-        Please <a href='account.html'>log in or register</a> first if you want to make your score visible.</p>
-        <div style='margin:15px'>
-            <input type='text' class='inp' id='code' autocomplete='off' style='width: 250px'>
-            <button class='btn' onclick='submitCode()' id='btn_c'>Submit code</button>
-        </div>
-        <p><a href='index.html'>Go back to the leaderboard</a></p>
+        <h1>Entries</h1>
+		<p>
+			<script>
+				document.write("<a href='javascript:showEntry(0)'>#1: " + ents[0][0] + "</a>");
+				for (var i=1; i<ents.length; i++) {
+					document.write("<br><a href='javascript:showEntry("+i+")'>#" + (i+1) + ": " + ents[i][0] + "</a>");
+				}
+			</script>
+		</p>
+        <p><a href='index.html'>Go back</a></p>
     </div>
     
     <div class="box centered" id="box_entry" style='display:none'>
         <h1>New entry acquired</h1>
         <p><b id='entry_name'>#0: bepis</b></p>
         <div id='entry_text'><p>bepis</p></div>
-        <p><a href='index.html'>Go back to the leaderboard</a></p>
+        <p><a href='submit.html'>Go back</a></p>
     </div>
 </div>
 
